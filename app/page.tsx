@@ -43,11 +43,14 @@ const Test = () => {
     };
   
     useEffect(() => {
-      if (!handleKeys) return;
-      document.addEventListener("keydown", handleEvent("document.keydown"));
-
+      const handler = (e: KeyboardEvent) => {
+        if (!handleKeys) return;
+        handleEvent("document.keydown")(e);
+      }
+      document.addEventListener("keydown", handler);
+      
       return () => {
-        document.removeEventListener("keydown", handleEvent("document.keydown"));
+        document.removeEventListener("keydown", handler);
       }
     }, [handleKeys]);
 
