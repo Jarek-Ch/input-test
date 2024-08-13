@@ -16,8 +16,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} h-full`}>
-        <div className="p-8 flex flex-col gap-4 h-full">
+      <body className={`${inter.className} h-[100dvh]`}>
+        <div className="p-8 flex flex-col gap-4 h-[100dvh]">
           {children}
         </div>
       </body>

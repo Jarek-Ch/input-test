@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // Istnieje prawdopodobieństwo 10^(-size) że uuid się powtórzy
 const generateID = (size: number = 9) => {
@@ -8,6 +8,7 @@ const generateID = (size: number = 9) => {
 };
 
 const Test = () => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [log, setLog] = useState<string[]>([]);
   const [val, setVal] = useState<string>("");
   const [handleKeys, setHandleKeys] = useState<boolean>(false);
@@ -41,18 +42,33 @@ const Test = () => {
         `,
       ]);
     };
-  
-    useEffect(() => {
-      const handler = (e: KeyboardEvent) => {
-        if (!handleKeys) return;
-        handleEvent("document.keydown")(e);
-      }
-      document.addEventListener("keydown", handler);
-      
-      return () => {
-        document.removeEventListener("keydown", handler);
-      }
-    }, [handleKeys]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!handleKeys) return;
+      handleEvent("onKeyDown")(e);
+    };
+
+    const onTextInput = (e: unknown) => {
+      var char = e?.data; // In our example = "a"
+      var keyCode = char.charCodeAt(0); // a = 97
+
+      setLog((prev) => [
+        ...prev,
+        `<strong>onTextInput</strong><br/>
+        char:${char} keyCode:${keyCode}
+        `,
+      ]);
+    };
+
+    document.addEventListener("keydown", handler);
+    inputRef.current?.addEventListener("textInput", onTextInput);
+    return () => {
+      document.removeEventListener("keydown", handler);
+      document.removeEventListener("textInput", onTextInput);
+
+    };
+  }, [handleKeys]);
 
   return (
     <>
@@ -79,9 +95,17 @@ const Test = () => {
           onPaste={handleEvent("onPaste")}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setVal(e.target.value);
+            setLog((prev) => [
+              ...prev,
+              `
+                <strong>onChange</strong><br/>
+                value:${e.target.value}
+              `,
+            ]);
           }}
           onFocus={() => setHandleKeys(true)}
           onBlur={() => setHandleKeys(false)}
+          ref={inputRef}
         />
         <button
           className="border b-white rounded p-2 text-xs"
@@ -92,7 +116,6 @@ const Test = () => {
         >
           Clear
         </button>
-        <div>handleKeys:{handleKeys ? "true": "false"}</div>
       </div>
       <div className="mt-4 flex flex-col gap-2 text-xs">
         {log.toReversed().map((l, i) => (
