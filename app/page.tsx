@@ -9,6 +9,7 @@ const generateID = (size: number = 9) => {
 
 const Test = () => {
   const [log, setLog] = useState<string[]>([]);
+  const [val, setVal] = useState<string>("");
 
   const handleEvent =
     (name: string) =>
@@ -55,15 +56,22 @@ const Test = () => {
         `}
           pattern="\d"
           min="0"
+          value={val}
           inputMode="numeric"
           onKeyPress={handleEvent("onKeyPress")}
           onKeyUp={handleEvent("onKeyUp")}
           onKeyDown={handleEvent("onKeyDown")}
           onPaste={handleEvent("onPaste")}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setVal(e.target.value);
+          }}
         />
         <button
           className="border b-white rounded p-2 text-xs"
-          onClick={() => setLog([])}
+          onClick={() => {
+            setLog([]);
+            setVal("");
+          }}
         >
           Clear
         </button>
