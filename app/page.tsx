@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Istnieje prawdopodobieństwo 10^(-size) że uuid się powtórzy
 const generateID = (size: number = 9) => {
@@ -10,6 +10,7 @@ const generateID = (size: number = 9) => {
 const Test = () => {
   const [log, setLog] = useState<string[]>([]);
   const [val, setVal] = useState<string>("");
+  const [handleKeys, setHandleKeys] = useState<boolean>(false);
 
   const handleEvent =
     (name: string) =>
@@ -17,6 +18,7 @@ const Test = () => {
       e:
         | React.KeyboardEvent<HTMLInputElement>
         | React.ClipboardEvent<HTMLInputElement>
+        | KeyboardEvent
     ) => {
       if ("key" in e) {
         setLog((prev) => [
@@ -39,6 +41,16 @@ const Test = () => {
         `,
       ]);
     };
+  
+    useEffect(() => {
+      if (!handleKeys) return;
+      document.addEventListener("keydown", handleEvent("document.keydown"));
+
+      return () => {
+        document.removeEventListener("keydown", handleEvent("document.keydown"));
+      }
+    }, [handleKeys]);
+
   return (
     <>
       <div className="flex gap-2">
@@ -65,6 +77,8 @@ const Test = () => {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setVal(e.target.value);
           }}
+          onFocus={() => setHandleKeys(true)}
+          onBlur={() => setHandleKeys(false)}
         />
         <button
           className="border b-white rounded p-2 text-xs"
@@ -75,6 +89,7 @@ const Test = () => {
         >
           Clear
         </button>
+        <div>handleKeys:{handleKeys ? "true": "false"}</div>
       </div>
       <div className="mt-4 flex flex-col gap-2 text-xs">
         {log.toReversed().map((l, i) => (
