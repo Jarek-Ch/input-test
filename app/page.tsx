@@ -21,9 +21,9 @@ const Test = () => {
         setLog((prev) => [
           ...prev,
           `
-        <strong>${name}</strong><br/>
-        ${e.type} ${e.key} ${e.code} ${e.keyCode} ${e.charCode} ${e.which}
-      `,
+            <strong>${name}</strong> (${e.type})<br/>
+            key:${e.key} code:${e.code} keyCode:${e.keyCode} charCode:${e.charCode} which:${e.which}
+          `,
         ]);
         return;
       }
@@ -33,9 +33,9 @@ const Test = () => {
       setLog((prev) => [
         ...prev,
         `
-        <strong>${name}</strong><br/>
-        ${e.type} ${clipboardData} ${e.clipboardData?.types}
-      `,
+          <strong>${name}</strong> (${e.type})<br/>
+          clipboardData:${clipboardData} types:${e.clipboardData?.types}
+        `,
       ]);
     };
   return (
