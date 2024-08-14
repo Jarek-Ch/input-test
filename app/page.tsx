@@ -44,29 +44,31 @@ const Test = () => {
     };
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       if (!handleKeys) return;
       handleEvent("onKeyDown")(e);
     };
 
-    const onTextInput = (e: unknown) => {
-      var char = e?.data; // In our example = "a"
-      var keyCode = char.charCodeAt(0); // a = 97
+    const onTextInput = (e: Event) => {
+      if ("data" in e) {
+        const char = e?.data; // In our example = "a"
+        const keyCode = String(char).charCodeAt(0); // a = 97
 
-      setLog((prev) => [
-        ...prev,
-        `<strong>onTextInput</strong><br/>
-        char:${char} keyCode:${keyCode}
-        `,
-      ]);
+        setLog((prev) => [
+          ...prev,
+          `
+            <strong>onTextInput</strong><br/>
+            char:${char} keyCode:${keyCode}
+          `,
+        ]);
+      }
     };
 
-    document.addEventListener("keydown", handler);
+    document.addEventListener("keydown", onKeyDown);
     inputRef.current?.addEventListener("textInput", onTextInput);
     return () => {
-      document.removeEventListener("keydown", handler);
+      document.removeEventListener("keydown", onKeyDown);
       document.removeEventListener("textInput", onTextInput);
-
     };
   }, [handleKeys]);
 
