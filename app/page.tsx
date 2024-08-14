@@ -11,7 +11,6 @@ const Test = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [log, setLog] = useState<string[]>([]);
   const [val, setVal] = useState<string>("");
-  const [handleKeys, setHandleKeys] = useState<boolean>(false);
 
   const handleEvent =
     (name: string) =>
@@ -25,7 +24,7 @@ const Test = () => {
         setLog((prev) => [
           ...prev,
           `
-            <strong>${name}</strong> (${e.type})<br/>
+            <strong>${name}</strong> (${e.type}) ${new Date().toLocaleTimeString()}<br/>
             key:${e.key} code:${e.code} keyCode:${e.keyCode} charCode:${e.charCode} which:${e.which}
           `,
         ]);
@@ -37,40 +36,42 @@ const Test = () => {
       setLog((prev) => [
         ...prev,
         `
-          <strong>${name}</strong> (${e.type})<br/>
+          <strong>${name}</strong> (${e.type}) ${new Date().toLocaleTimeString()}<br/>
           clipboardData:${clipboardData} types:${e.clipboardData?.types}
         `,
       ]);
     };
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (!handleKeys) return;
-      handleEvent("onKeyDown")(e);
-    };
-
     const onTextInput = (e: Event) => {
       if ("data" in e) {
-        const char = e?.data; // In our example = "a"
-        const keyCode = String(char).charCodeAt(0); // a = 97
+        const char = e?.data;
+        const keyCode = String(char).charCodeAt(0);
 
         setLog((prev) => [
           ...prev,
           `
-            <strong>onTextInput</strong><br/>
+            <strong>onTextInput</strong> ${new Date().toLocaleTimeString()}<br/>
             char:${char} keyCode:${keyCode}
           `,
         ]);
       }
+      setLog((prev) => [
+        ...prev,
+        `
+          <strong>onTextInput</strong> ${new Date().toLocaleTimeString()}<br/>
+          not "data" in e
+        `,
+      ]);
     };
 
-    document.addEventListener("keydown", onKeyDown);
-    inputRef.current?.addEventListener("textInput", onTextInput);
+    const input = inputRef.current;
+
+    input?.addEventListener("textInput", onTextInput);
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("textInput", onTextInput);
+      input?.removeEventListener("textInput", onTextInput);
     };
-  }, [handleKeys]);
+  }, []);
 
   return (
     <>
@@ -100,13 +101,11 @@ const Test = () => {
             setLog((prev) => [
               ...prev,
               `
-                <strong>onChange</strong><br/>
+                <strong>onChange</strong> ${new Date().toLocaleTimeString()}<br/>
                 value:${e.target.value}
               `,
             ]);
           }}
-          onFocus={() => setHandleKeys(true)}
-          onBlur={() => setHandleKeys(false)}
           ref={inputRef}
         />
         <button
